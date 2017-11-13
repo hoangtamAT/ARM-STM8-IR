@@ -30,15 +30,15 @@
 #include "stm8s.h"
 #include "stm8s_clk.h"
 #include "IR.h"
-#include "stm8s_uart1.h"
-#include "stm8s_eeprom.h"
 
-#define IR_PORT GPIOD
+#define IR_PORT GPIOB
 #define IR_PIN  GPIO_PIN_4
-#define BTN     GPIO_ReadInputData(GPIOB)
-#define L1      GPIO_PIN_3
+#define BTN     GPIO_ReadInputData(GPIOD)
+#define STT     GPIO_PIN_2
+#define L1      GPIO_PIN_7
 #define L2      GPIO_PIN_6
 #define L3      GPIO_PIN_5
+#define L4      GPIO_PIN_4
 #define LED     GPIOC
     
 
@@ -56,13 +56,15 @@ uint8_t mode=0;
 void CLK_Config(void);
 void learnKey();
 void handle();
+uint8_t checkButton();
 void main(void)
 {
   /* Infinite loop */
   CLK_Config();
   GPIO_Init(IR_PORT,IR_PIN,GPIO_MODE_IN_PU_NO_IT);
-  GPIO_Init(GPIOB,GPIO_PIN_4,GPIO_MODE_IN_PU_NO_IT);
-  GPIO_Init(GPIOC,GPIO_PIN_ALL,GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIO_Init(GPIOD,GPIO_PIN_4,GPIO_MODE_IN_PU_NO_IT);
+  GPIO_Init(GPIOD,GPIO_PIN_2,GPIO_MODE_OUT_PP_HIGH_SLOW);
+  GPIO_Init(GPIOC,GPIO_PIN_ALL,GPIO_MODE_OUT_PP_HIGH_SLOW);
   
   FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
 /* Unlock Data memory */
@@ -71,25 +73,56 @@ void main(void)
   //GPIO_Init(GPIOC,GPIO_PIN_4,GPIO_MODE_OUT_PP_LOW_SLOW);
   //GPIO_Init(GPIOC,GPIO_PIN_5,GPIO_MODE_OUT_PP_LOW_SLOW);
   //eepromWriteByte(1,0x55);
+  GPIO_WriteLow(GPIOD,STT);
+  delay_us(dl50ms);
+  delay_us(dl50ms);
+  delay_us(dl50ms);
+  delay_us(dl50ms);
+  delay_us(dl50ms);
+  GPIO_WriteHigh(GPIOD,STT);
 
   while (1)
   {  
-   key=IR_GetCode();
-   if((BTN&0x10)==0)
-   {
-     mode=1;
-     GPIO_WriteHigh(LED,L1); 
-     delay_us(dl50ms);
-     GPIO_WriteLow(LED,L1);
-   }
-   if(mode!=0) learnKey();
-   else
-   {
-      handle();
-   }
+    key=IR_GetCode();
+    if(checkButton())
+    {
+       GPIO_WriteLow(GPIOD,STT);
+       mode=1;
+    }
+    if(mode==0) handle();
+    else
+    { 
+      learnKey();
+      if(checkButton())
+      {
+        GPIO_WriteHigh(GPIOD,STT);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        GPIO_WriteLow(GPIOD,STT);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        GPIO_WriteHigh(GPIOD,STT);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        GPIO_WriteLow(GPIOD,STT);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        delay_us(dl50ms);
+        GPIO_WriteHigh(GPIOD,STT);
+        GPIO_WriteHigh(LED,L1|L2|L3|L4);
+        mode=0;
+      }
+    }
 
   }
-   
+    
   
 }
 
@@ -103,6 +136,20 @@ void CLK_Config(void)
   /* Output Fcpu on CLK_CCO pin */
   CLK_CCOConfig(CLK_OUTPUT_MASTER);
 }
+uint8_t checkButton()
+{
+   uint8_t i;
+   if((BTN&0x10)==0)
+   {
+     for(i=0;i<30;i++)
+     {
+        delay_us(dl50ms);
+        if((BTN&0x10)==0x10) return 0;
+     }
+     return 1;
+   }
+   return 0;
+}
 
 void learnKey()
 {
@@ -112,9 +159,8 @@ void learnKey()
         if(key)
         {
           FLASH_ProgramByte(0x004000,key);
-          GPIO_WriteHigh(LED,L1);
-          delay_us(dl50ms);
           GPIO_WriteLow(LED,L1);
+          delay_us(dl50ms);
           delay_us(dl50ms);
           mode=2;
           break;
@@ -123,9 +169,8 @@ void learnKey()
         if(key)
         {
           FLASH_ProgramByte(0x004001,key);
-          GPIO_WriteHigh(LED,L2);
-          delay_us(dl50ms);
           GPIO_WriteLow(LED,L2);
+          delay_us(dl50ms);
           delay_us(dl50ms);
           mode=3;
           break;
@@ -134,23 +179,21 @@ void learnKey()
         if(key)
         {
           FLASH_ProgramByte(0x004002,key);
-          GPIO_WriteHigh(LED,L3);
-          delay_us(dl50ms);
           GPIO_WriteLow(LED,L3);
           delay_us(dl50ms);
-          GPIO_WriteHigh(LED,L1);
+          delay_us(dl50ms);
+          mode=4;
+          break;
+        }
+     case 4:
+        if(key)
+        {
+          FLASH_ProgramByte(0x004003,key);
+          GPIO_WriteLow(LED,L4);
           delay_us(dl50ms);
           delay_us(dl50ms);
-          delay_us(dl50ms);
-          GPIO_WriteHigh(LED,L2);
-          delay_us(dl50ms);
-          delay_us(dl50ms);
-          delay_us(dl50ms);
-          GPIO_WriteHigh(LED,L3);
-          delay_us(dl50ms);
-          delay_us(dl50ms);
-          delay_us(dl50ms);
-          GPIO_WriteLow(LED,L1|L2|L3);
+          GPIO_WriteHigh(LED,L1|L2|L3|L4);
+          GPIO_WriteHigh(GPIOD,STT);
           mode=0;
           break;
         }
@@ -172,6 +215,11 @@ void handle()
      if(key)
      {
        if(key==FLASH_ReadByte(0x004002)) GPIO_WriteReverse(LED,L3);
+       delay_us(dl50ms);
+     }
+     if(key)
+     {
+       if(key==FLASH_ReadByte(0x004003)) GPIO_WriteReverse(LED,L4);
        delay_us(dl50ms);
      }
 }
