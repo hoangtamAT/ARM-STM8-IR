@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\TAM\K\ARM\STM8\PROJECT\IR\EWSTM8\settings\IR.Debug.general.xcl" --backend -f "E:\TAM\K\ARM\STM8\PROJECT\IR\EWSTM8\settings\IR.Debug.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "D:\ARM STM8\PROJECT\ARM-STM8-IR\EWSTM8\settings\IR.Debug.general.xcl" --backend -f "D:\ARM STM8\PROJECT\ARM-STM8-IR\EWSTM8\settings\IR.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "E:\TAM\K\ARM\STM8\PROJECT\IR\EWSTM8\settings\IR.Debug.general.xcl" "--debug_file=%~1" --backend -f "E:\TAM\K\ARM\STM8\PROJECT\IR\EWSTM8\settings\IR.Debug.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "D:\ARM STM8\PROJECT\ARM-STM8-IR\EWSTM8\settings\IR.Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\ARM STM8\PROJECT\ARM-STM8-IR\EWSTM8\settings\IR.Debug.driver.xcl" 
 
 @echo off 
 :end

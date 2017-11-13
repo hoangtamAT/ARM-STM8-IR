@@ -257,8 +257,8 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>E:\TAM\K\ARM\STM8\PROJECT\IR\User</state>
-          <state>E:\TAM\K\ARM\STM8\PROJECT\IR\Library\inc</state>
+          <state>D:\ARM STM8\PROJECT\ARM-STM8-IR\User</state>
+          <state>D:\ARM STM8\PROJECT\ARM-STM8-IR\Library\inc</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1598,16 +1598,10 @@
       <name>$PROJ_DIR$\..\Library\src\stm8s_clk.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\Library\src\stm8s_eeprom.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\Library\src\stm8s_flash.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\Library\src\stm8s_gpio.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Library\src\stm8s_uart1.c</name>
     </file>
   </group>
   <group>
